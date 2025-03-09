@@ -80,6 +80,39 @@ void print_grid(WINDOW *grid[GRID_DIM_Y][GRID_DIM_X], Table *data, vec_t *grid_p
     }
 }
 
+void free_grid(WINDOW *grid[GRID_DIM_Y][GRID_DIM_X]) {
+    for (int y = 0; y < GRID_DIM_Y; y++) {
+	for (int x = 0; x < GRID_DIM_X; x++) {
+	    delwin(grid[y][x]);
+	}
+    }
+}
+
+void reinit(win_t *title, win_t *body, WINDOW *grid[GRID_DIM_Y][GRID_DIM_X], Table *data, vec_t *grid_pos) {
+    free_grid(grid);
+
+    delwin(body->win);
+    delwin(title->win);
+    endwin();
+
+    initscr();
+
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    init_title(title);
+    init_body(body, title);
+    init_grid(grid, body);
+    
+    print_title(title, "shoosh");
+    print_grid(grid, data, grid_pos);
+
+    refresh();
+    wrefresh(title->win);
+    wrefresh(body->win);
+}
+
 int main(void) {
     win_t title, body;
     WINDOW *grid[GRID_DIM_Y][GRID_DIM_X];
@@ -114,7 +147,8 @@ int main(void) {
 	key = getch();
 
 	switch (key) {
-	    case KEY_RESIZE: // erm
+	    case KEY_RESIZE:
+		reinit(&title, &body, grid, data, &grid_pos);
 		break;
 
 	    default:
@@ -124,14 +158,9 @@ int main(void) {
 
 
 
-    for (int y = 0; y < GRID_DIM_Y; y++) {
-	for (int x = 0; x < GRID_DIM_X; x++) {
-	    delwin(grid[y][x]);
-	}
-    }
-
     free(data);
 
+    free_grid(grid);
     delwin(body.win);
     delwin(title.win);
     endwin();
