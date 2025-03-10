@@ -157,31 +157,25 @@ int main(void) {
 	    case KEY_LEFT:
 		grid_pos.x--;
 
-		update(&title, &body, grid, data, &grid_pos);
-
 		break;
 	    
 	    case KEY_UP:
 		grid_pos.y--;
-
-		update(&title, &body, grid, data, &grid_pos);
 
 		break;
 	    
 	    case KEY_DOWN:
 		grid_pos.y++;
 
-		update(&title, &body, grid, data, &grid_pos);
-
 		break;
 
 	    case KEY_RIGHT:
 		grid_pos.x++;
 
-		update(&title, &body, grid, data, &grid_pos);
-
 		break;
 	}
+	
+	update(&title, &body, grid, data, &grid_pos);
     } while (key != 'q');
 
 
