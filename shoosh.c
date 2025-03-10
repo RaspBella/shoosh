@@ -74,7 +74,7 @@ void print_grid(WINDOW *grid[GRID_DIM_Y][GRID_DIM_X], Table *data, vec_t *grid_p
 	    }
 	    
 	    else {
-		mvwprintw(grid[y][x], 1, 2, "%c%c", y + 'A', x + 'A');
+		mvwprintw(grid[y][x], 1, 2, "%c%c", real_y, real_x);
 	    }
 	}
     }
@@ -113,6 +113,19 @@ void reinit(win_t *title, win_t *body, WINDOW *grid[GRID_DIM_Y][GRID_DIM_X], Tab
     wrefresh(body->win);
 }
 
+void update(win_t *title, win_t *body, WINDOW *grid[GRID_DIM_Y][GRID_DIM_X], Table *data, vec_t *grid_pos) {
+    init_title(title);
+    init_body(body, title);
+    init_grid(grid, body);
+    
+    print_title(title, "shoosh");
+    print_grid(grid, data, grid_pos);
+
+    refresh();
+    wrefresh(title->win);
+    wrefresh(body->win);
+}
+
 int main(void) {
     win_t title, body;
     WINDOW *grid[GRID_DIM_Y][GRID_DIM_X];
@@ -130,18 +143,7 @@ int main(void) {
     noecho();
     keypad(stdscr, TRUE);
 
-    init_title(&title);
-    init_body(&body, &title);
-    init_grid(grid, &body);
-    
-    print_title(&title, "shoosh");
-    print_grid(grid, data, &grid_pos);
-
-    refresh();
-    wrefresh(title.win);
-    wrefresh(body.win);
-
-
+    update(&title, &body, grid, data, &grid_pos);
 
     do {
 	key = getch();
@@ -149,9 +151,35 @@ int main(void) {
 	switch (key) {
 	    case KEY_RESIZE:
 		reinit(&title, &body, grid, data, &grid_pos);
+
 		break;
 
-	    default:
+	    case KEY_LEFT:
+		grid_pos.x--;
+
+		update(&title, &body, grid, data, &grid_pos);
+
+		break;
+	    
+	    case KEY_UP:
+		grid_pos.y--;
+
+		update(&title, &body, grid, data, &grid_pos);
+
+		break;
+	    
+	    case KEY_DOWN:
+		grid_pos.y++;
+
+		update(&title, &body, grid, data, &grid_pos);
+
+		break;
+
+	    case KEY_RIGHT:
+		grid_pos.x++;
+
+		update(&title, &body, grid, data, &grid_pos);
+
 		break;
 	}
     } while (key != 'q');
